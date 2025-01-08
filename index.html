@@ -2,213 +2,105 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Match Cards Game</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale = 1.0">
+    
+    <title>
+        Mach Cards Game
+    </title>
+
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
 
     <style>
-        .bg-b {
-            background-color: #6fb3f3;
-        }
+        .bg-danger-subtle {
+        background-color: var(--bs-danger-bg-subtle);
+    }
 
-        .btn {
-            background-color: var(--bs-danger);
-            border-color: #333;
-        }
+    .btn {
+        background-color: var(--bs-danger);
+        border-color: #333;
+    }
 
-        .btn:hover {
-            background-color: var(--bs-light); 
-            border-color: #333;
-        }
+    .btn:hover {
+        background-color: var(--bs-light); 
+        border-color: #333;
+    }
 
-        .card-container {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-        }
-
-        .card {
-            width: 100px;
-            height: 100px;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: 2px solid #333;
-        }
-
-        .card img {
-            width: 80%;
-            height: auto;
-            display: none;
-        }
-
-        .card.open img {
-            display: block;
-        }
-
-        .timer {
-            font-size: 1.5rem;
+    #mach_card {
+            font-size: 4rem;
             font-weight: bold;
+            margin-bottom: 2rem;
+            color: #333;
+            font-family:'Times New Roman', Times, serif;
+            position: relative;
+            z-index: 1;
+    }
+    
+    .center-container {
+            position: relative;
+            text-align: center;
+            width: 100%;
         }
 
-        /* Custom Modal Styling */
-        .custom-modal {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-            z-index: 1050;
-        }
 
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
+    .image-wrapper {
+            position: relative;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1049;
-        }
+    }
+
+    .custom-image {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            transition: transform 0.3s;
+    }
+
+    .custom-image:hover {
+            transform: scale(1.1);
+    }
+
+    .image1 { top: -330px; left: 50%; transform: translateX(-50%); } /* Above the text */
+    .image2 { top: 50%; left: -100px; transform: translateY(-50%); } /* Left of the text */
+    .image3 { top: calc(100% + 60px); left: 60%; transform: translateX(-50%); } /* Below the text */
+    .image4 { top: -150px; right: -100px; transform: translateY(-50%); } /* Right of the text */
+    .image5 { top: 30px; left: 10%; } /* Top-left diagonal */
+    .image6 { top: 60%; left: 80%; } /* Bottom-right diagonal */
+    .image7 { top: -300px; left: 80%; transform: translateX(-50%); }
+    .image8 { top: 120px; left: 40%; transform: translateX(-50%); }
+    .image9 { top: -250px; left: 20%; transform: translateX(-50%); }
+    
+    
     </style>
 </head>
-<body class="bg-b vh-100 d-flex flex-column justify-content-center align-items-center">
-    
-    <div class="grid-container text-center">
-        <h1 class="mb-4">Match Cards Game!</h1>
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <span class="timer">Time: <span id="timer">0</span>s</span>
-            <button class="btn" id="reset">Reset Game</button>
+
+<body class="container bg-danger-subtle d-flex justify-content-center vh-100 align-items-center">
+
+    <div class="center-container">
+
+        <h1 id="mach_card">MACH CARD</h1>
+        <div class="image-wrapper">
+            <!-- Images positioned around the text -->
+            <img src="Images/angry.png" class="custom-image image1" alt="Image angry">
+            <img src="Images/bored.png" class="custom-image image2" alt="Image bored">
+            <img src="Images/cool.png" class="custom-image image3" alt="Image cool">
+            <img src="Images/cry.png" class="custom-image image4" alt="Image cry">
+            <img src="Images/devil.png" class="custom-image image5" alt="Image devil">
+            <img src="Images/emoticon.png" class="custom-image image6" alt="Image emoticon">
+            <img src="Images/excited.png" class="custom-image image7" alt="Image excited">
+            <img src="Images/happy.png" class="custom-image image8" alt="Image happy">
+            <img src="Images/in-love.png" class="custom-image image9" alt="Image in-love">
         </div>
 
-        <div class="card-container" id="card-container"></div>
+        <div class="d-grid gap-2 col-6 mx-auto">
+            <button class="btn" type="button" onclick="window.location.href='gameStart.html'">Start the Game</button>
+          </div>
+        
+
     </div>
 
-    <!-- Custom Modal -->
-    <div id="modalOverlay" class="modal-overlay"></div>
-    <div id="customModal" class="custom-modal">
-        <h4>Congratulations!</h4>
-        <p>You completed the game in <span id="modalTime">0</span> seconds.</p>
-        <button class="btn btn-primary" id="closeModal">Close</button>
-    </div>
-
-    <script>
-        const cardImages = [
-            "Images/angry.png",
-            "Images/bored.png",
-            "Images/cool.png",
-            "Images/cry.png",
-            "Images/devil.png",
-            "Images/emoticon.png"
-        ];
-
-        let timer = 0;
-        let timerInterval;
-        let openedCards = [];
-        let matchedCards = [];
-
-        const timerElement = document.getElementById("timer");
-        const resetButton = document.getElementById("reset");
-        const cardContainer = document.getElementById("card-container");
-        const customModal = document.getElementById("customModal");
-        const modalOverlay = document.getElementById("modalOverlay");
-        const modalTime = document.getElementById("modalTime");
-        const closeModalButton = document.getElementById("closeModal");
-
-        function startTimer() {
-            timer = 0;
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                timer++;
-                timerElement.textContent = timer;
-            }, 1000);
-        }
-
-        function stopTimer() {
-            clearInterval(timerInterval);
-        }
-
-        function resetGame() {
-            stopTimer();
-            startTimer();
-            cardContainer.innerHTML = "";
-            createCards(); 
-            openedCards = [];
-            matchedCards = [];
-        }
-
-        function createCards() {
-            const cards = [...cardImages, ...cardImages]
-                .sort(() => Math.random() - 0.5)
-                .map((src, index) => {
-                    const card = document.createElement("div");
-                    card.classList.add("card", "bg-white");
-                    card.dataset.index = index;
-
-                    const img = document.createElement("img");
-                    img.src = src;
-                    img.alt = `Card ${index}`;
-
-                    card.appendChild(img);
-                    cardContainer.appendChild(card);
-
-                    card.addEventListener("click", () => handleCardClick(card));
-                });
-        }
-
-        function handleCardClick(card) {
-            if (card.classList.contains("open") || matchedCards.includes(card)) return;
-
-            card.classList.add("open");
-            openedCards.push(card);
-
-            if (openedCards.length === 2) {
-                checkMatch();
-            }
-        }
-
-        function checkMatch() {
-            const [firstCard, secondCard] = openedCards;
-            const firstImage = firstCard.querySelector("img").src;
-            const secondImage = secondCard.querySelector("img").src;
-
-            if (firstImage === secondImage) {
-                matchedCards.push(firstCard, secondCard);
-                openedCards = [];
-
-                if (matchedCards.length === cardImages.length * 2) {
-                    stopTimer();
-                    showModal();
-                }
-            } else {
-                setTimeout(() => {
-                    firstCard.classList.remove("open");
-                    secondCard.classList.remove("open");
-                    openedCards = [];
-                }, 1000);
-            }
-        }
-
-        function showModal() {
-            modalTime.textContent = timer;  // Set the time in the modal
-            customModal.style.display = 'block';
-            modalOverlay.style.display = 'block';
-        }
-
-        closeModalButton.addEventListener("click", () => {
-            customModal.style.display = 'none';
-            modalOverlay.style.display = 'none';
-            resetGame();
-        });
-
-        resetButton.addEventListener("click", resetGame);
-        resetGame();
-    </script>
+    
 </body>
+
 </html>
