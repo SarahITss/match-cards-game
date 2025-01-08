@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match Cards Game</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .bg-b {
+            background-color: #6fb3f3;
+        }
+
+        .btn {
+            background-color: var(--bs-danger);
+            border-color: #333;
+        }
+
+        .btn:hover {
+            background-color: var(--bs-light); 
+            border-color: #333;
+        }
+
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .card {
+            width: 100px;
+            height: 100px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #333;
+        }
+
+        .card img {
+            width: 80%;
+            height: auto;
+            display: none;
+        }
+
+        .card.open img {
+            display: block;
+        }
+
+        .timer {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        /* Custom Modal Styling */
+        .custom-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            z-index: 1050;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1049;
+        }
+    </style>
+</head>
+<body class="bg-b vh-100 d-flex flex-column justify-content-center align-items-center">
+    
+    <div class="grid-container text-center">
+        <h1 class="mb-4">Match Cards Game!</h1>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <span class="timer">Time: <span id="timer">0</span>s</span>
+            <button class="btn" id="reset">Reset Game</button>
+        </div>
+
+        <div class="card-container" id="card-container"></div>
+    </div>
+
+    <!-- Custom Modal -->
+    <div id="modalOverlay" class="modal-overlay"></div>
+    <div id="customModal" class="custom-modal">
+        <h4>Congratulations!</h4>
+        <p>You completed the game in <span id="modalTime">0</span> seconds.</p>
+        <button class="btn btn-primary" id="closeModal">Close</button>
+    </div>
+
+    <script>
+        const cardImages = [
+            "Images/angry.png",
+            "Images/bored.png",
+            "Images/cool.png",
+            "Images/cry.png",
+            "Images/devil.png",
+            "Images/emoticon.png"
+        ];
+
+        let timer = 0;
+        let timerInterval;
+        let openedCards = [];
+        let matchedCards = [];
+
+        const timerElement = document.getElementById("timer");
+        const resetButton = document.getElementById("reset");
+        const cardContainer = document.getElementById("card-container");
+        const customModal = document.getElementById("customModal");
+        const modalOverlay = document.getElementById("modalOverlay");
+        const modalTime = document.getElementById("modalTime");
+        const closeModalButton = document.getElementById("closeModal");
+
+        function startTimer() {
+            timer = 0;
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timer++;
+                timerElement.textContent = timer;
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        function resetGame() {
+            stopTimer();
+            startTimer();
+            cardContainer.innerHTML = "";
+            createCards(); 
+            openedCards = [];
+            matchedCards = [];
+        }
+
+        function createCards() {
+            const cards = [...cardImages, ...cardImages]
+                .sort(() => Math.random() - 0.5)
+                .map((src, index) => {
+                    const card = document.createElement("div");
+                    card.classList.add("card", "bg-white");
+                    card.dataset.index = index;
+
+                    const img = document.createElement("img");
+                    img.src = src;
+                    img.alt = `Card ${index}`;
+
+                    card.appendChild(img);
+                    cardContainer.appendChild(card);
+
+                    card.addEventListener("click", () => handleCardClick(card));
+                });
+        }
+
+        function handleCardClick(card) {
+            if (card.classList.contains("open") || matchedCards.includes(card)) return;
+
+            card.classList.add("open");
+            openedCards.push(card);
+
+            if (openedCards.length === 2) {
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            const [firstCard, secondCard] = openedCards;
+            const firstImage = firstCard.querySelector("img").src;
+            const secondImage = secondCard.querySelector("img").src;
+
+            if (firstImage === secondImage) {
+                matchedCards.push(firstCard, secondCard);
+                openedCards = [];
+
+                if (matchedCards.length === cardImages.length * 2) {
+                    stopTimer();
+                    showModal();
+                }
+            } else {
+                setTimeout(() => {
+                    firstCard.classList.remove("open");
+                    secondCard.classList.remove("open");
+                    openedCards = [];
+                }, 1000);
+            }
+        }
+
+        function showModal() {
+            modalTime.textContent = timer;  // Set the time in the modal
+            customModal.style.display = 'block';
+            modalOverlay.style.display = 'block';
+        }
+
+        closeModalButton.addEventListener("click", () => {
+            customModal.style.display = 'none';
+            modalOverlay.style.display = 'none';
+            resetGame();
+        });
+
+        resetButton.addEventListener("click", resetGame);
+        resetGame();
+    </script>
+</body>
+</html>
